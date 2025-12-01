@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Clientes</h3>
+        <div class="value">{{ total_clients }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Pedidos Pendientes</h3>
+        <div class="value">{{ pending_orders }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Productos en Inventario</h3>
+        <div class="value">{{ total_products }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Ventas del Mes</h3>
+        <div class="value">${{ monthly_sales }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Pedidos Recientes</h2>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.client.name }}</td>
+                    <td>{{ order.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <span
+                            style="color: {{ 'var(--success-color)' if order.status == 'Completed' else 'var(--accent-color)' }}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td>${{ order.total }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay pedidos recientes</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

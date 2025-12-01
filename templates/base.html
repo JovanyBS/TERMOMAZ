@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMOMAZ Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>TERMOMAZ</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}"
+                            class="{{ 'active' if request.endpoint == 'index' else '' }}"><i class="fas fa-home"></i>
+                            Inicio</a></li>
+                    <li><a href="{{ url_for('clients') }}"
+                            class="{{ 'active' if request.endpoint == 'clients' else '' }}"><i class="fas fa-users"></i>
+                            Clientes</a></li>
+                    <li><a href="{{ url_for('inventory') }}"
+                            class="{{ 'active' if request.endpoint == 'inventory' else '' }}"><i
+                                class="fas fa-boxes"></i> Inventario</a></li>
+                    <li><a href="{{ url_for('orders') }}"
+                            class="{{ 'active' if request.endpoint == 'orders' else '' }}"><i
+                                class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="content">
+            <header>
+
+</html>

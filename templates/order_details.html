@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalles del Pedido #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="modal-header">
+        <h2>Pedido #{{ order.id }}</h2>
+        <div>
+            <span class="badge badge-{{ 'success' if order.status == 'Completed' else 'warning' }}">{{ order.status
+                }}</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+            <h3 class="text-lg font-medium">Información del Cliente</h3>
+            <p><strong>Nombre:</strong> {{ order.client.name }}</p>
+            <p><strong>Email:</strong> {{ order.client.email }}</p>
+            <p><strong>Teléfono:</strong> {{ order.client.phone }}</p>
+
+            <div class="mt-4">
+                <h4 class="text-md font-medium text-gray-700">Dirección de Envío</h4>
+                <form action="{{ url_for('update_order_address', id=order.id) }}" method="POST" class="mt-2">
+                    <div class="flex gap-2">
+                        <input type="text" name="shipping_address" value="{{ order.shipping_address or '' }}"
+                            class="form-control text-sm" placeholder="Dirección de envío">
+                        <button type="submit" class="btn btn-primary btn-sm whitespace-nowrap">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <h3 class="text-lg font-medium">Resumen del Pedido</h3>
+            <p><strong>Fecha:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>Total:</strong> ${{ "%.2f"|format(order.total) }}</p>
+
+            <form action="{{ url_for('update_order_status', id=order.id) }}" method="POST"
+                class="mt-4 flex items-center">
+                <select name="status" class="form-control mr-2" style="width: auto;">
+                    <option value="Pending" {% if order.status=='Pending' %}selected{% endif %}>Pendiente</option>
+                    <option value="Completed" {% if order.status=='Completed' %}selected{% endif %}>Completado</option>
+                    <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>Cancelado</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Actualizar Estado</button>
+            </form>
+        </div>
+    </div>
+
+    <hr class="my-6">
+
+    <div class="modal-header">
+        <h3>Items del Pedido</h3>
+    </div>
+
+    <div class="table-container mb-6">
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio Unitario</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>${{ "%.2f"|format(item.price_at_time) }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ "%.2f"|format(item.price_at_time * item.quantity) }}</td>
+                    <td>
+                        <a href="{{ url_for('remove_order_item', id=order.id, item_id=item.id) }}"
+                            class="text-red-600 hover:text-red-900"
+                            onclick="return confirm('¿Eliminar este item?')">Eliminar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-gray-500">No hay productos en este pedido.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-gray-50 p-4 rounded-lg">
+        <h4 class="text-lg font-medium mb-4">Agregar Producto</h4>
+        <form action="{{ url_for('add_order_item', id=order.id) }}" method="POST" class="flex items-end gap-4">
+            <div class="flex-grow">
+                <label class="block text-sm font-medium text-gray-700">Producto</label>
+                <select name="product_id" class="form-control w-full" required>
+                    {% for product in products %}
+                    <option value="{{ product.id }}">
+                        {{ product.name }} (Stock: {{ product.stock }}) - ${{ product.price }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-32">
+                <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+                <input type="number" name="quantity" value="1" min="1" class="form-control w-full" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar</button>
+        </form>
+    </div>
+
+    <div class="mt-6">
+        <a href="{{ url_for('orders') }}" class="text-indigo-600 hover:text-indigo-900">&larr; Volver a Pedidos</a>
+    </div>
+</div>
+{% endblock %}
