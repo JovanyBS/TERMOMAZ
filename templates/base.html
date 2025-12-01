@@ -31,6 +31,9 @@
                     <li><a href="{{ url_for('orders') }}"
                             class="{{ 'active' if request.endpoint == 'orders' else '' }}"><i
                                 class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                    <li><a href="{{ url_for('reports') }}"
+                            class="{{ 'active' if request.endpoint == 'reports' else '' }}"><i class="fas fa-file"></i>
+                            Reportes</a></li>
                 </ul>
             </nav>
         </aside>
