@@ -44,7 +44,6 @@
     </div>
 </div>
 
-<!-- Add Product Modal -->
 <div id="addProductModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
     aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -107,7 +106,6 @@
     </div>
 </div>
 
-<!-- Edit Product Modal -->
 <div id="editProductModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
     aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -172,19 +170,17 @@
 </div>
 
 <script>
-    function toggleModal(modalID) {
-        document.getElementById(modalID).classList.toggle("hidden");
-        document.getElementById(modalID).classList.toggle("flex");
-    }
-
     function openEditModal(id, name, category, price, stock, description) {
+        // Aseguramos que 'price' y 'stock' son valores limpios antes de asignarlos a los inputs numericos
+        let cleanPrice = String(price).replace('$', '');
         document.getElementById('editProductForm').action = '/inventory/edit/' + id;
         document.getElementById('edit_name').value = name;
         document.getElementById('edit_category').value = category;
-        document.getElementById('edit_price').value = price;
+        document.getElementById('edit_price').value = cleanPrice;
         document.getElementById('edit_stock').value = stock;
         document.getElementById('edit_description').value = description;
         toggleModal('editProductModal');
     }
 </script>
 {% endblock %}
+// Nota: Necesitas una función 'toggleModal' en tu base

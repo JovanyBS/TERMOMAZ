@@ -22,6 +22,8 @@
     </div>
 </div>
 
+---
+
 <div class="card">
     <div class="card-header">
         <h2>Pedidos Recientes</h2>
@@ -44,8 +46,11 @@
                     <td>{{ order.client.name }}</td>
                     <td>{{ order.date.strftime('%Y-%m-%d') }}</td>
                     <td>
-                        <span
-                            style="color: {{ 'var(--success-color)' if order.status == 'Completed' else 'var(--accent-color)' }}">
+                        <span class="order-status 
+                            {% if order.status == 'Completed' %}status-completed
+                            {% elif order.status == 'Pending' %}status-pending
+                            {% elif order.status == 'Shipped' %}status-shipped
+                            {% else %}status-default{% endif %}">
                             {{ order.status }}
                         </span>
                     </td>
@@ -60,4 +65,5 @@
         </table>
     </div>
 </div>
+
 {% endblock %}

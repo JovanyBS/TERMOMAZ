@@ -34,10 +34,36 @@
                     <li><a href="{{ url_for('reports') }}"
                             class="{{ 'active' if request.endpoint == 'reports' else '' }}"><i class="fas fa-file"></i>
                             Reportes</a></li>
+                    <li><a href="{{ url_for('pos') }}" class="{{ 'active' if request.endpoint == 'pos' else '' }}"><i
+                                class="fas fa-cash-register"></i>
+                            Punto de Venta</a></li>
                 </ul>
             </nav>
         </aside>
         <main class="content">
             <header>
+                <h1>{% block title %}{% endblock %}</h1>
+            </header>
+
+            <div class="page-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg {{ 'bg-green-100 text-green-700' if category == 'success' else 'bg-red-100 text-red-700' }}"
+                        role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
 
 </html>
