@@ -63,147 +63,102 @@
 </div>
 
 <!-- Modal para Añadir Cliente -->
-<div id="addClientModal" class="hidden fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog"  
-    aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"            
-            onclick="toggleModal('addClientModal')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div            
-            class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <form action="{{ url_for('add_client') }}" method="POST">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-xl leading-6 font-bold text-gray-900 mb-4" id="modal-title">
-                                Añadir Nuevo Cliente
-                            </h3>
-                            <div class="mt-2 space-y-4">
-                                <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
-                                    <input type="text" name="name" id="name" required
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono</label>
-                                    <input type="text" name="phone" id="phone"
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                                    <input type="email" name="email" id="email"
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label for="address"
-                                        class="block text-sm font-medium text-gray-700">Dirección</label>
-                                    <input type="text" name="address" id="address"
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-xl">
-                    <button type="submit"
-                        class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm transition duration-150">
-                        Guardar
-                    </button>
-                    <button type="button"
-                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition duration-150"
-                        onclick="toggleModal('addClientModal')">
-                        Cancelar
-                    </button>
-                </div>
-            </form>
+<div id="addClientModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div
+        class="bg-white rounded-xl shadow-2xl w-full max-w-md border border-gray-200 transform transition-all scale-100">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200">
+            <h3 class="text-xl font-bold text-gray-800">Añadir Nuevo Cliente</h3>
+            <button onclick="toggleModal('addClientModal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
         </div>
+        <form action="{{ url_for('add_client') }}" method="POST">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                    <input type="text" name="name" id="name" required
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" name="phone" id="phone"
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" id="email"
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    <textarea name="address" id="address" rows="2"
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+                <button type="button" onclick="toggleModal('addClientModal')"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">Cancelar</button>
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-lg hover:shadow-indigo-500/30 transition-all">Guardar</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Modal para Editar Cliente -->
-<div id="editClientModal" class="hidden fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
-    aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"            
-            onclick="toggleModal('editClientModal')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div            
-            class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <form id="editClientForm" method="POST">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-xl leading-6 font-bold text-gray-900 mb-4" id="modal-title">
-                                Editar Cliente
-                            </h3>
-                            <div class="mt-2 space-y-4">
-                                <div>
-                                    <label for="edit_name"
-                                        class="block text-sm font-medium text-gray-700">Nombre</label>
-                                    <input type="text" name="name" id="edit_name" required
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label for="edit_phone"
-                                        class="block text-sm font-medium text-gray-700">Teléfono</label>
-                                    <input type="text" name="phone" id="edit_phone"
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label for="edit_email"
-                                        class="block text-sm font-medium text-gray-700">Email</label>
-                                    <input type="email" name="email" id="edit_email"
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label for="edit_address"
-                                        class="block text-sm font-medium text-gray-700">Dirección</label>
-                                    <input type="text" name="address" id="edit_address"
-                                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-xl">
-                    <button type="submit"
-                        class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm transition duration-150">
-                        Actualizar
-                    </button>
-                    <button type="button"
-                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition duration-150"
-                        onclick="toggleModal('editClientModal')">
-                        Cancelar
-                    </button>
-                </div>
-            </form>
+<div id="editClientModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div
+        class="bg-white rounded-xl shadow-2xl w-full max-w-md border border-gray-200 transform transition-all scale-100">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200">
+            <h3 class="text-xl font-bold text-gray-800">Editar Cliente</h3>
+            <button onclick="toggleModal('editClientModal')"
+                class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
         </div>
+        <form id="editClientForm" method="POST">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="edit_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                    <input type="text" name="name" id="edit_name" required
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="edit_phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" name="phone" id="edit_phone"
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="edit_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" id="edit_email"
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="edit_address" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    <textarea name="address" id="edit_address" rows="2"
+                        class="form-control w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+                <button type="button" onclick="toggleModal('editClientModal')"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">Cancelar</button>
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-lg hover:shadow-indigo-500/30 transition-all">Actualizar</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-    // Función para mostrar/ocultar modales (asume que está definida en base.html o en el global scope)
-    function toggleModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) {
-            modal.classList.toggle('hidden');
-        }
-    }
-
     function openEditModal(id, name, phone, email, address) {
-        // CORRECCIÓN CLAVE: Usamos un ID numérico de marcador de posición (99999) que Flask puede procesar 
-        // y luego lo reemplazamos con el ID real del cliente en JavaScript.
-        // Esto evita el ValueError al intentar convertir 'temp_id' a un entero.
         const editUrlTemplate = '{{ url_for("edit_client", id=99999) }}';
         document.getElementById('editClientForm').action = editUrlTemplate.replace('99999', id);
 
-        // Rellena los campos del formulario con los datos del cliente
         document.getElementById('edit_name').value = name;
         document.getElementById('edit_phone').value = phone;
         document.getElementById('edit_email').value = email;
         document.getElementById('edit_address').value = address;
 
-        // Muestra el modal de edición
         toggleModal('editClientModal');
     }
 </script>

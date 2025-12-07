@@ -27,6 +27,8 @@ class Order(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='Pending') # Pending, Completed, Cancelled
     total = db.Column(db.Float, default=0.0)
+    paid_amount = db.Column(db.Float, default=0.0)
+    payment_status = db.Column(db.String(20), default='Pending') # Pending, Partial, Paid
     shipping_address = db.Column(db.String(200))
     items = db.relationship('OrderItem', backref='order', lazy=True, cascade="all, delete-orphan")
 

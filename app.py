@@ -369,7 +369,25 @@ def create_pos_order():
             total_order += product.price * quantity
             
         # 3. Asignar el total final a la orden
+        # 3. Asignar el total final a la orden
         new_order.total = total_order
+
+        # --- Payment Logic ---
+        payment_type = data.get('payment_type', 'full') # 'full' or 'partial'
+        payment_amount = float(data.get('payment_amount', 0))
+        
+        if payment_type == 'full':
+            new_order.paid_amount = total_order
+            new_order.payment_status = 'Paid'
+        else:
+            new_order.paid_amount = payment_amount
+            if payment_amount >= total_order:
+                 new_order.payment_status = 'Paid'
+            elif payment_amount > 0:
+                 new_order.payment_status = 'Partial'
+            else:
+                 new_order.payment_status = 'Pending'
+        # ---------------------
         
         # 4. Commit final
         db.session.commit()
@@ -381,6 +399,75 @@ def create_pos_order():
         db.session.rollback()
         print(f"Error en create_pos_order: {e}")
         return jsonify({'success': False, 'message': f'Error interno del servidor: {str(e)}'})
+
+# --- API Endpoints para AJAX (Modales) ---
+
+@app.route('/api/clients', methods=['POST'])
+def api_add_client():
+    data = request.get_json()
+    try:
+        name = data.get('name')
+        if not name:
+             return jsonify({'success': False, 'message': 'El nombre es requerido'})
+             
+        new_client = Client(
+            name=name,
+            phone=data.get('phone'),
+            email=data.get('email'),
+            address=data.get('address')
+        )
+        db.session.add(new_client)
+        db.session.commit()
+        return jsonify({
+            'success': True, 
+            'client': {
+                'id': new_client.id,
+                'name': new_client.name,
+                'phone': new_client.phone
+            },
+            'message': 'Cliente agregado correctamente'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/products', methods=['POST'])
+def api_add_product():
+    data = request.get_json()
+    try:
+        name = data.get('name')
+        price = data.get('price')
+        stock = data.get('stock')
+        
+        if not name or price is None or stock is None:
+            return jsonify({'success': False, 'message': 'Nombre, precio y stock son requeridos'})
+
+        new_product = Product(
+            name=name,
+            category=data.get('category'),
+            price=float(price),
+            stock=int(stock),
+            description=data.get('description')
+        )
+        db.session.add(new_product)
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'product': {
+                'id': new_product.id,
+                'name': new_product.name,
+                'price': new_product.price,
+                'stock': new_product.stock,
+                'category': new_product.category,
+                'description': new_product.description
+            },
+            'message': 'Producto agregado correctamente'
+        })
+    except ValueError:
+        return jsonify({'success': False, 'message': 'Precio y stock deben ser números válidos'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)})
 
 # --- Rutas de Reportes (Simplificadas) ---
 
