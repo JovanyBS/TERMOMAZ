@@ -1,15 +1,103 @@
 {% extends 'base.html' %}
 
-{% block title %}Reportes{% endblock %}
+
+
+{% block title %}Reportes de Ventas e Inventario{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2>Reportes</h2>
+<div class="space-y-6">
+    <!-- Header & Filtros -->
+    <div class="card p-4 flex flex-col sm:flex-row justify-between items-end gap-4">
+        <form action="{{ url_for('reports') }}" method="GET"
+            class="flex flex-col sm:flex-row items-end gap-4 w-full sm:w-auto">
+            <div>
+                <label for="start_date" class="block text-sm font-medium text-gray-700">Fecha Inicio</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date }}" class="form-control"
+                    required>
+            </div>
+            <div>
+                <label for="end_date" class="block text-sm font-medium text-gray-700">Fecha Fin</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date }}" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary whitespace-nowrap">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            <a href="{{ url_for('reports') }}" class="btn btn-secondary text-gray-600 whitespace-nowrap">
+                Limpiar
+            </a>
+        </form>
+        <div>
+            <button onclick="window.print()" class="btn btn-secondary text-gray-700 border-gray-300 hover:bg-gray-50">
+                <i class="fas fa-print mr-2"></i> Imprimir Reporte
+            </button>
+        </div>
     </div>
-    <div class="p-6 text-center text-gray-500">
-        <i class="fas fa-hard-hat fa-3x mb-4"></i>
-        <p class="text-xl">Esta funcionalidad está en desarrollo.</p>
+
+    <!-- Resumen de Ventas -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-indigo-500">
+            <h3 class="text-sm font-medium text-gray-500">Ventas Totales</h3>
+            <p class="text-2xl font-bold text-gray-900">${{ "%.2f"|format(total_sales) }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+            <h3 class="text-sm font-medium text-gray-500">Pedidos Totales</h3>
+            <p class="text-2xl font-bold text-gray-900">{{ total_orders_count }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+            <h3 class="text-sm font-medium text-gray-500">Completados</h3>
+            <p class="text-2xl font-bold text-green-600">{{ completed_orders }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-yellow-500">
+            <h3 class="text-sm font-medium text-gray-500">Pendientes</h3>
+            <p class="text-2xl font-bold text-yellow-600">{{ pending_orders }}</p>
+        </div>
+    </div>
+
+    <!-- Rotación de Inventario -->
+    <div class="card">
+        <div class="card-header border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Rotación de Inventario (Productos Vendidos)</h2>
+        </div>
+        <div class="table-container">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Producto</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Categoría</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Vendidos</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Ingresos Gen.</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Stock Actual</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in rotation_data %}
+                    <tr class="{{ 'bg-yellow-50' if item.product.stock < 5 else '' }}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ item.product.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ item.product.category }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-indigo-600">
+                            {{ item.sold }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                            ${{ "%.2f"|format(item.revenue) }}
+                        </td>
+                        <td
+                            class="px-6 py-4 whitespace-nowrap text-sm text-right {{ 'text-red-600 font-bold' if item.product.stock < 5 else 'text-green-600' }}">
+                            {{ item.product.stock }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

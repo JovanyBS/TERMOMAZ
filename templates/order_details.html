@@ -40,6 +40,14 @@
             <h3 class="text-lg font-medium">Resumen del Pedido</h3>
             <p><strong>Fecha:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M') }}</p>
             <p><strong>Total:</strong> ${{ "%.2f"|format(order.total) }}</p>
+            <p><strong>Pagado:</strong> ${{ "%.2f"|format(order.paid_amount or 0) }}</p>
+            <p class="text-xl mt-2">
+                <strong>Restante:</strong>
+                <span
+                    class="{{ 'text-green-600' if (order.total - (order.paid_amount or 0)) <= 0.01 else 'text-red-600' }}">
+                    ${{ "%.2f"|format(order.total - (order.paid_amount or 0)) }}
+                </span>
+            </p>
 
             <form action="{{ url_for('update_order_status', id=order.id) }}" method="POST"
                 class="mt-4 flex items-center">
@@ -50,6 +58,24 @@
                 </select>
                 <button type="submit" class="btn btn-primary btn-sm">Actualizar Estado</button>
             </form>
+
+            <!-- Payment Section -->
+            {% set remaining = order.total - (order.paid_amount or 0) %}
+            {% if remaining > 0.01 %}
+            <div class="mt-6 bg-yellow-50 p-4 rounded border border-yellow-200">
+                <h4 class="font-bold text-yellow-800 mb-2">Registrar Pago / Liquidar</h4>
+                <form action="{{ url_for('add_order_payment', id=order.id) }}" method="POST" class="flex gap-2">
+                    <input type="number" step="0.01" name="amount" value="{{ '%.2f'|format(remaining) }}"
+                        class="form-control bg-white text-gray-900 border-gray-300" style="width: 120px;"
+                        placeholder="Monto">
+                    <button type="submit"
+                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm font-medium">
+                        <i class="fas fa-check-circle mr-1"></i> Pagar
+                    </button>
+                </form>
+                <small class="text-gray-600">Al pagar el total, la orden se completará automáticamente.</small>
+            </div>
+            {% endif %}
         </div>
     </div>
 

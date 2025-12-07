@@ -78,14 +78,15 @@
                     <span class="text-gray-600">Total</span>
                     <span class="text-2xl font-bold text-gray-800">${{ "%.2f"|format(order.total) }}</span>
                 </div>
-                {% if order.paid_amount > 0 %}
+                {% if (order.paid_amount or 0) > 0 %}
                 <div class="flex justify-between items-center py-1 text-sm">
                     <span class="text-gray-500">Pagado</span>
-                    <span class="text-green-600 font-medium">-${{ "%.2f"|format(order.paid_amount) }}</span>
+                    <span class="text-green-600 font-medium">-${{ "%.2f"|format(order.paid_amount or 0) }}</span>
                 </div>
                 <div class="flex justify-between items-center py-1 border-t border-gray-100 mt-2 pt-2">
                     <span class="text-gray-600 font-bold">Restante</span>
-                    <span class="text-xl font-bold text-red-500">${{ "%.2f"|format(order.total - order.paid_amount)
+                    <span class="text-xl font-bold text-red-500">${{ "%.2f"|format(order.total - (order.paid_amount or
+                        0))
                         }}</span>
                 </div>
                 {% endif %}

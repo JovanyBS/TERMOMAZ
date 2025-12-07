@@ -307,6 +307,43 @@ def update_order_address(id):
         flash(f'Error al actualizar dirección: {e}', 'error')
     return redirect(url_for('order_details', id=id))
 
+@app.route('/orders/<int:id>/add_payment', methods=['POST'])
+def add_order_payment(id):
+    order = Order.query.get_or_404(id)
+    try:
+        amount = float(request.form.get('amount', 0))
+        
+        if amount <= 0:
+            flash('El monto del pago debe ser mayor a 0.', 'error')
+            return redirect(url_for('order_details', id=id))
+
+        # Actualizar monto pagado
+        order.paid_amount = (order.paid_amount or 0) + amount
+        
+        # Calcular restante
+        remaining = order.total - order.paid_amount
+
+        # Lógica de auto-completado
+        if remaining <= 0.01: # Usamos un pequeño margen por errores de punto flotante
+            order.status = 'Completed'
+            order.payment_status = 'Paid'
+            # Si pagó de más, podríamos ajustar el paid_amount al total exacto o dejarlo como "crédito"
+            # Por simplicidad, dejamos el paid_amount tal cual se ingresó.
+            flash(f'Pago registrado. ¡La orden ha sido totalmente liquidada y marcada como COMPLETADA!', 'success')
+        else:
+            order.payment_status = 'Partial'
+            flash(f'Pago de ${amount} registrado. Restan ${remaining:.2f}', 'success')
+
+        db.session.commit()
+
+    except ValueError:
+        flash('Monto inválido.', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al registrar pago: {e}', 'error')
+
+    return redirect(url_for('order_details', id=id))
+
 @app.route('/orders/<int:id>/note')
 def order_note(id):
     order = Order.query.get_or_404(id)
@@ -478,7 +515,80 @@ def api_add_product():
 
 @app.route('/reports')
 def reports():
-    return render_template('reports.html')
+    # 1. Obtener filtros de fecha
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    
+    # Valores por defecto: Mes actual
+    today = date.today()
+    if not start_date_str:
+        start_date = datetime(today.year, today.month, 1)
+        start_date_str = start_date.strftime('%Y-%m-%d')
+    else:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        except ValueError:
+             start_date = datetime(today.year, today.month, 1) # Fallback
+
+    if not end_date_str:
+        # Fin de mes (aproximado, o hoy)
+        end_date = datetime.combine(today, datetime.max.time())
+        end_date_str = today.strftime('%Y-%m-%d')
+    else:
+        try:
+             # Aseguramos que cubra todo el día final
+             end_date_dt = datetime.strptime(end_date_str, '%Y-%m-%d')
+             end_date = datetime.combine(end_date_dt.date(), datetime.max.time())
+        except ValueError:
+             end_date = datetime.combine(today, datetime.max.time())
+
+    # 2. Consultas para Reporte de Pedidos
+    orders_query = Order.query.filter(Order.date >= start_date, Order.date <= end_date)
+    orders = orders_query.all()
+    
+    total_sales = sum(o.total for o in orders)
+    total_orders_count = len(orders)
+    completed_orders = sum(1 for o in orders if o.status == 'Completed')
+    pending_orders = sum(1 for o in orders if o.status == 'Pending')
+    
+    # 3. Consultas para Rotación de Inventario
+    # Queremos: Producto, Unidades Vendidas (en el rango), Stock Actual, Ingresos Generados
+    
+    # Obtenemos todos los items de las órdenes en el rango
+    # Optimización: Podríamos hacer esto con una query de agregación de SQL, pero en Python es más legible para este prototipo.
+    
+    rotation_data = {} # {product_id: {'product': obj, 'sold': 0, 'revenue': 0}}
+    
+    # Precargamos productos para no hacer N queries
+    all_products = {p.id: p for p in Product.query.all()}
+    
+    # Inicializamos con 0 para todos los productos (para ver los que NO se vendieron también, opcional)
+    for p_id, p in all_products.items():
+        rotation_data[p_id] = {'product': p, 'sold': 0, 'revenue': 0}
+
+    for order in orders:
+        # Solo contamos ventas de pedidos no cancelados? O todos?
+        # Generalmente rotación incluye todo lo que salió del inventario.
+        # Si el pedido está 'Cancelled' y repusimos stock, NO debería contar.
+        if order.status == 'Cancelled':
+            continue
+            
+        for item in order.items:
+            if item.product_id in rotation_data:
+                rotation_data[item.product_id]['sold'] += item.quantity
+                rotation_data[item.product_id]['revenue'] += (item.price_at_time * item.quantity)
+    
+    # Convertir a lista y ordenar por unidades vendidas (descendente)
+    rotation_list = sorted(rotation_data.values(), key=lambda x: x['sold'], reverse=True)
+
+    return render_template('reports.html', 
+                           start_date=start_date_str,
+                           end_date=end_date_str,
+                           total_sales=total_sales,
+                           total_orders_count=total_orders_count,
+                           completed_orders=completed_orders,
+                           pending_orders=pending_orders,
+                           rotation_data=rotation_list)
 
 # --- Inicialización de la Aplicación ---
 
