@@ -104,18 +104,36 @@
             <div class="p-4 space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-400 mb-1 uppercase tracking-wider">Cliente</label>
-                    <div class="relative">
-                        <select id="pos-client-id"
-                            class="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 appearance-none">
-                            <option value="">Seleccionar Cliente...</option>
-                            {% for client in clients %}
-                            <option value="{{ client.id }}">{{ client.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                            <i class="fas fa-chevron-down text-xs"></i>
+                    <!-- Hidden Input for Logic -->
+                    <input type="hidden" id="pos-client-id">
+
+                    <!-- Search Input (Initially Visible) -->
+                    <div id="client-search-container" class="relative">
+                        <input type="text" id="client-search" placeholder="Buscar cliente..."
+                            class="bg-gray-900 border border-gray-600 text-white text-sm rounded-t-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-0.5"
+                            autocomplete="off">
+                        <ul id="client-results"
+                            class="bg-gray-900 border border-gray-600 text-white text-sm rounded-b-lg block w-full max-h-40 overflow-y-auto custom-scrollbar absolute z-20 shadow-xl hidden">
+                            <!-- Options injected by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Selected Client Display (Initially Hidden) -->
+                    <div id="selected-client-display"
+                        class="hidden bg-blue-900/30 border border-blue-500/50 rounded-lg p-3 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h4 id="selected-client-name" class="font-bold text-white text-sm">Nombre Cliente</h4>
+                                <span class="text-xs text-blue-300">Cliente Seleccionado</span>
+                            </div>
                         </div>
+                        <button onclick="clearClientSelection()" class="text-gray-400 hover:text-white p-1">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -474,6 +492,79 @@
             console.error('Error:', error);
             alert('Ocurrió un error al procesar el pedido');
         }
+    }
+
+    // Client Search Logic
+    // --- Improved Client Search Logic ---
+    const clientsData = [
+        {% for client in clients %}
+    { id: {{ client.id }}, name: "{{ client.name }}", search: "{{ client.name|lower }}" },
+    {% endfor %}
+    ];
+
+    const searchInput = document.getElementById('client-search');
+    const resultsList = document.getElementById('client-results');
+    const hiddenInput = document.getElementById('pos-client-id');
+    const displayContainer = document.getElementById('selected-client-display');
+    const searchContainer = document.getElementById('client-search-container');
+    const displayName = document.getElementById('selected-client-name');
+
+    // Filter Function
+    searchInput.addEventListener('input', function (e) {
+        const term = e.target.value.toLowerCase();
+        resultsList.innerHTML = '';
+
+        if (term.length > 0) {
+            const matches = clientsData.filter(c => c.search.includes(term));
+
+            if (matches.length > 0) {
+                resultsList.classList.remove('hidden');
+                matches.forEach(c => {
+                    const li = document.createElement('li');
+                    li.className = "p-2.5 hover:bg-blue-600 cursor-pointer transition-colors";
+                    li.textContent = c.name;
+                    li.onclick = () => selectClient(c.id, c.name);
+                    resultsList.appendChild(li);
+                });
+            } else {
+                resultsList.classList.add('hidden');
+            }
+        } else {
+            resultsList.classList.add('hidden');
+        }
+    });
+
+    // Hide results on blur (delayed to allow click)
+    searchInput.addEventListener('blur', () => {
+        setTimeout(() => resultsList.classList.add('hidden'), 200);
+    });
+
+    // Focus shows results if text exists
+    searchInput.addEventListener('focus', () => {
+        if (searchInput.value.length > 0) resultsList.classList.remove('hidden');
+    });
+
+    window.selectClient = function (id, name) {
+        hiddenInput.value = id;
+        displayName.textContent = name;
+
+        // UI Toggle
+        searchContainer.classList.add('hidden');
+        displayContainer.classList.remove('hidden');
+
+        // Reset Search
+        searchInput.value = '';
+        resultsList.classList.add('hidden');
+    }
+
+    window.clearClientSelection = function () {
+        hiddenInput.value = '';
+
+        // UI Toggle
+        displayContainer.classList.add('hidden');
+        searchContainer.classList.remove('hidden');
+
+        searchInput.focus();
     }
 </script>
 

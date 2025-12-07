@@ -13,6 +13,7 @@
 
 <body>
     <div class="app-container">
+        {% block sidebar %}
         <aside class="sidebar">
             <div class="logo">
                 <h2>TERMOMAZ</h2>
@@ -40,6 +41,7 @@
                 </ul>
             </nav>
         </aside>
+        {% endblock %}
         <main class="content">
             <header>
                 <h1>{% block title %}{% endblock %}</h1>

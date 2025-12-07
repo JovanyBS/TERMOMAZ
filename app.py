@@ -421,14 +421,19 @@ def create_pos_order():
         if payment_type == 'full':
             new_order.paid_amount = total_order
             new_order.payment_status = 'Paid'
+            # Explicitly keep status as Pending per user request
+            new_order.status = 'Pending'
         else:
             new_order.paid_amount = payment_amount
-            if payment_amount >= total_order:
+            if payment_amount >= total_order - 0.01:
                  new_order.payment_status = 'Paid'
             elif payment_amount > 0:
                  new_order.payment_status = 'Partial'
             else:
                  new_order.payment_status = 'Pending'
+            
+            # Ensure status is Pending
+            new_order.status = 'Pending'
         # ---------------------
         
         # 4. Commit final
