@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota de Pedido #{{ order.id }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .shadow-lg {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8">
+
+    <div class="max-w-2xl mx-auto bg-white p-8 shadow-lg rounded-lg" id="printable-area">
+        <!-- Header -->
+        <div class="flex justify-between items-start border-b border-gray-200 pb-6 mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">TERMOMAZ</h1>
+                <p class="text-gray-500 text-sm mt-1">Nota de Pedido</p>
+            </div>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-800">#{{ order.id }}</p>
+                <p class="text-gray-500 text-sm">{{ order.date.strftime('%d/%m/%Y') }}</p>
+            </div>
+        </div>
+
+        <!-- Client Info -->
+        <div class="mb-8">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Cliente</h2>
+            <div class="text-gray-800">
+                <p class="font-bold text-lg">{{ order.client.name }}</p>
+                <p>{{ order.client.phone }}</p>
+                <p class="text-gray-600 mt-1">{{ order.shipping_address or 'Sin dirección de envío' }}</p>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="w-full mb-8">
+            <thead>
+                <tr class="border-b-2 border-gray-200">
+                    <th class="text-left py-2 text-sm font-bold text-gray-600 uppercase">Producto</th>
+                    <th class="text-center py-2 text-sm font-bold text-gray-600 uppercase">Cant.</th>
+                    <th class="text-right py-2 text-sm font-bold text-gray-600 uppercase">Precio</th>
+                    <th class="text-right py-2 text-sm font-bold text-gray-600 uppercase">Total</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700">
+                {% for item in order.items %}
+                <tr class="border-b border-gray-100">
+                    <td class="py-3">{{ item.product.name }}</td>
+                    <td class="text-center py-3">{{ item.quantity }}</td>
+                    <td class="text-right py-3">${{ "%.2f"|format(item.price_at_time) }}</td>
+                    <td class="text-right py-3 font-medium">${{ "%.2f"|format(item.price_at_time * item.quantity) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="flex justify-end border-t border-gray-200 pt-4">
+            <div class="w-1/2">
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-gray-600">Total</span>
+                    <span class="text-2xl font-bold text-gray-800">${{ "%.2f"|format(order.total) }}</span>
+                </div>
+                {% if order.paid_amount > 0 %}
+                <div class="flex justify-between items-center py-1 text-sm">
+                    <span class="text-gray-500">Pagado</span>
+                    <span class="text-green-600 font-medium">-${{ "%.2f"|format(order.paid_amount) }}</span>
+                </div>
+                <div class="flex justify-between items-center py-1 border-t border-gray-100 mt-2 pt-2">
+                    <span class="text-gray-600 font-bold">Restante</span>
+                    <span class="text-xl font-bold text-red-500">${{ "%.2f"|format(order.total - order.paid_amount)
+                        }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-12 text-center text-sm text-gray-400 border-t border-gray-100 pt-6">
+            <p>Gracias por su compra</p>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="max-w-2xl mx-auto mt-6 flex justify-center gap-4 no-print">
+        <button onclick="window.print()"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir
+        </button>
+        <button onclick="window.close()"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">
+            Cerrar
+        </button>
+    </div>
+
+</body>
+
+</html>

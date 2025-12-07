@@ -307,6 +307,11 @@ def update_order_address(id):
         flash(f'Error al actualizar dirección: {e}', 'error')
     return redirect(url_for('order_details', id=id))
 
+@app.route('/orders/<int:id>/note')
+def order_note(id):
+    order = Order.query.get_or_404(id)
+    return render_template('order_note.html', order=order)
+
 # --- Rutas de POS (Punto de Venta) ---
 
 @app.route('/pos')
