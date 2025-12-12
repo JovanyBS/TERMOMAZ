@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from models import db, Client, Product, Order, OrderItem
 import os
+import sys
 from datetime import datetime, date
 
 # --- Configuración de la Aplicación ---
-app = Flask(__name__)
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    static_folder = os.path.join(sys._MEIPASS, 'static')
+    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+else:
+    app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///termomaz.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # La clave secreta es necesaria para las sesiones y los mensajes flash
@@ -610,4 +616,14 @@ if __name__ == '__main__':
             
     # Ejecutar la aplicación
     # Se recomienda usar gunicorn o waitress para producción, pero para desarrollo está bien.
-    app.run(debug=True, port=5000)
+    if getattr(sys, 'frozen', False):
+        # Si se ejecuta como ejecutable (PyInstaller), desactivar debug
+        # y abrir el navegador automáticamente (opcional, pero útil)
+        import webbrowser
+        from threading import Timer
+        def open_browser():
+            webbrowser.open_new('http://127.0.0.1:5000/')
+        Timer(1, open_browser).start()
+        app.run(debug=False, port=5000)
+    else:
+        app.run(debug=True, port=5000)
